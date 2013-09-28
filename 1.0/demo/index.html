@@ -1,0 +1,181 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>KOrgChart 组织型图表 demo</title> 
+   <style>
+       body, html, div, p, span, a, h1, h2, h3, h4, h5 {
+            margin: 0;
+            padding: 0;
+        }
+
+        body, html {
+            width: 100%;
+            background:skyblue;
+        } 
+        /* Custom chart styling */
+        .jOrgChart {
+            margin: 10px;
+            padding: 20px;
+        }
+
+        /* Custom node styling */
+        .jOrgChart .node {
+            font-size: 14px;
+            background-color: #35363B;
+            border-radius: 8px;
+            border: 5px solid white;
+            color: #F38630;
+            -moz-border-radius: 8px;
+        }
+
+        .node p {
+            font-family: tahoma;
+            font-size: 10px;
+            line-height: 11px;
+            padding: 2px;
+        }
+        /* Basic styling */
+        /* Draw the lines */
+        .jOrgChart .line {
+            height: 20px;
+            width: 4px;
+        }
+
+        .jOrgChart .down {
+            background-color: black;
+            margin: 0px auto;
+        }
+
+        .jOrgChart .top {
+            border-top: 3px solid black;
+        }
+
+        .jOrgChart .left {
+            border-right: 2px solid black;
+        }
+
+        .jOrgChart .right {
+            border-left: 2px solid black;
+        }
+
+        /* node cell */
+        .jOrgChart td {
+            text-align: center;
+            vertical-align: top;
+            padding: 0;
+        }
+
+        /* The node */
+        .jOrgChart .node {
+            background-color: #35363B;
+            display: inline-block;
+            width: 96px;
+            height: 60px;
+            z-index: 10;
+            margin: 0 2px;
+        }
+
+        /* jQuery drag 'n drop */
+
+        .drag-active {
+            border-style: dotted !important;
+        }
+
+        .drop-hover {
+            border-style: solid !important;
+            border-color: #E05E00 !important;
+        }
+    </style> 
+    <script src="http://g.tbcdn.cn/kissy/k/1.3.0/seed-min.js" charset="utf-8"></script> 
+</head>
+<body>
+<div id="chart" class="orgChart"></div> 
+ <script src="data/nodeList.json.js" charset="gbk"></script>
+<script>
+   var S = KISSY;
+   if (S.Config.debug) {
+      S.config({ 
+            packages:[
+                {
+                    name:"gallery",
+                    path:"../../../",
+                    charset:"utf-8",
+                    ignorePackageNameInUri:true
+                }
+            ]
+        });
+    }
+
+   S.use('gallery/KOrgChart/1.0/index', function (S) {
+        KISSY.ready(function () {
+            $("#chart").jOrgChart({
+                nodeData: nodeList,
+                chartElement: '#chart',
+                dragAndDrop: true,
+                // preventDefault:true,
+                onselect: function (e, node) {
+
+                }
+            }, function (Util) {//回调函数
+                /**
+                *使用Kissy来实现拖放
+                */
+                KISSY.use("node,dd,dd/plugin/proxy", function (S, Node, DD, Proxy) {
+                    var DDM = DD.DDM,
+                        DraggableDelegate = DD.DraggableDelegate,
+                        DroppableDelegate = DD.DroppableDelegate;
+
+                    DDM.on("dragstart", function (ev) {
+                        var c = ev.drag;
+                        p = c.get("dragNode").css("position");
+                    });
+                    DDM.on("drophit", function (ev) {
+                        var drag = ev.drag,
+                            drop = ev.drop;
+                        var dragNode = drag.get("node"),
+                            dropNode = drop.get("node");
+
+                        var targetNode = $(dropNode).cache("tree-node"),
+                            sourceNode = $(dragNode).cache("tree-node");
+                        targetNode.nodes.push(sourceNode);
+                        //删除dataList上的源节点数据
+                        sourceNode.remove();
+
+                        /* reload the plugin */
+                        Util.refresh();
+                    });
+                    var dragDelegate = new DraggableDelegate({
+                        container: "#chart",
+                        selector: '.node',
+                        move: true,
+                        plugins: [
+                           new Proxy({
+                               /**
+                               * 产生替代节点
+                               * @param drag 当前拖对象
+                               */
+                               node: function (drag) {
+                                   var n = S.one(drag.get("dragNode")[0].cloneNode());
+                                   n.removeAttr('id');
+                                   n.css("opacity", 0.8);
+                                   return n;
+                               },
+                               // 主体位置不跟随 proxy
+                               moveOnEnd: false,
+                               // 每次 proxy 都重新生成
+                               destroyOnEnd: true
+                           })
+                        ]
+                    });
+                    var dropDelegate = new DroppableDelegate({
+                        container: "#chart",
+                        selector: '.node'
+                    });
+                });
+            }); //end of chart 
+        }); //end of ready
+    });//end of use
+</script>
+</body>
+</html>

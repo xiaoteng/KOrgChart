@@ -1,0 +1,14 @@
+{
+    "name": "KOrgChart",
+    "version": "1.0",
+    "desc": "模拟office组织型图表的组件",
+    "cover": "",
+    "tag":"组织型图表",
+    "author": {
+        "name": "腾骁",
+        "email": "panfei.pf@taobao.com",
+        "page": "https://github.com/xiaoteng"
+    },
+    "type": "kissy-gallery",
+    "type-url": "http://gallery.kissyui.com/guide"
+} 
