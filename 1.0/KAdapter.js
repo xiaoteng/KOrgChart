@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @fileoverview 
  * @author 腾骁<panfei.pf@taobao.com>
  * @module KOrgChart
@@ -94,6 +94,6 @@ KISSY.add(function () {
         })();
         window.jQuery = window.$ = jQuery;
     })(window);
-}, { requires: ["node,dom"] });
+}, { requires: ["node","dom"] });
 
 
